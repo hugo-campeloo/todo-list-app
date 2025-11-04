@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Instalando kubectl (se necessário)"
+      - curl -sLo /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+      - chmod +x /usr/local/bin/kubectl
+  pre_build:
+    commands:
+      - echo "Configurando kubeconfig para o cluster $EKS_CLUSTER_NAME na região $AWS_DEFAULT_REGION"
+      - aws eks update-kubeconfig --name "$EKS_CLUSTER_NAME" --region "$AWS_DEFAULT_REGION"
+  build:
+    commands:
+      - echo "Aplicando manifests"
+      - kubectl apply -f rendered/service.yaml
+      - kubectl apply -f rendered/deployment.yaml
+      - echo "Aguardando rollout"
+      - kubectl rollout status deployment/todo-app -n default --timeout=180s || (echo 'Rollout falhou' && exit 1)
+  post_build:
+    commands:
+      - echo "Deploy finalizado com sucesso."
+artifacts:
+  files:
+    - rendered/imageDetail.json

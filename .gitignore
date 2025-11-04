@@ -1,0 +1,13 @@
+# Ignorar artefatos locais do Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.*
+
+# Logs e temporários
+*.log
+*.tmp
+*.bak
+
+# Build output
+rendered/
