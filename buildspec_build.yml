@@ -5,18 +5,18 @@ phases:
       - aws --version
       - COMMIT_SHA=${CODEBUILD_RESOLVED_SOURCE_VERSION:0:7}
       - IMAGE_TAG=${COMMIT_SHA:-build-$RANDOM}
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin "$ECR_REPO_URI"
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin '$ECR_REPO_URI'
   build:
     commands:
-      - docker build -t "$ECR_REPO_URI:$IMAGE_TAG" .
-      - docker push "$ECR_REPO_URI:$IMAGE_TAG"
+      - docker build -t '$ECR_REPO_URI:$IMAGE_TAG' .
+      - docker push '$ECR_REPO_URI:$IMAGE_TAG'
       - mkdir -p rendered
       - sed "s#__IMAGE__#${ECR_REPO_URI}:${IMAGE_TAG}#g" k8s/deployment.yaml.tpl > rendered/deployment.yaml
       - cp k8s/service.yaml rendered/service.yaml
       - printf '{"image":"%s"}' "$ECR_REPO_URI:$IMAGE_TAG" > rendered/imageDetail.json
   post_build:
     commands:
-      - echo "Imagem publicada: $ECR_REPO_URI:$IMAGE_TAG"
+      - echo 'Build concluído com sucesso!'
 artifacts:
   files:
     - rendered/deployment.yaml
