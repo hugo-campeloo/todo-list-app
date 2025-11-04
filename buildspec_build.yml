@@ -1,5 +1,4 @@
 version: 0.2
-
 phases:
   pre_build:
     commands:
@@ -9,7 +8,6 @@ phases:
       - IMAGE_TAG=${COMMIT_SHA:-build-$RANDOM}
       - echo "Tag da imagem: $IMAGE_TAG"
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin "$ECR_REPO_URI"
-
   build:
     commands:
       - echo "Buildando a imagem $ECR_REPO_URI:$IMAGE_TAG"
@@ -21,12 +19,10 @@ phases:
       - cp k8s/service.yaml rendered/service.yaml
       - echo "Gerando arquivo de metadata da imagem"
       - printf '{"image":"%s"}' "$ECR_REPO_URI:$IMAGE_TAG" > rendered/imageDetail.json
-
   post_build:
     commands:
       - echo "Build concluído com sucesso!"
       - echo "Imagem publicada: $ECR_REPO_URI:$IMAGE_TAG"
-
 artifacts:
   files:
     - rendered/deployment.yaml
